@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Just A Drop - Charity: Water Game</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="dotgrid-bg"></div>
+  <!-- Charity: Water logo -->
+  <img src="img/cw_logo-horizontal.png" alt="Charity: Water" class="charity-logo" />
+
+  <!-- Just A Drop title (acts as logo and play button) -->
+  <div id="start-screen">
+    <img src="img/remove.photos-removed-background.png" alt="Just A Drop Game Logo" id="game-logo" />
+  </div>
+
+  <!-- Game UI -->
+  <div class="game-wrapper hidden">
+    <div class="top-bar">
+      <div class="score">Score: <span id="score">0</span></div>
+      <div class="timer">Time: <span id="time">30</span>s</div>
+      <div class="controls">
+        <button id="start-btn">▶️</button>
+        <button id="pause-btn">⏸</button>
+      </div>
+    </div>
+    <div id="game-container">
+      <canvas id="spark-canvas"></canvas>
+      <!-- ...other game elements... -->
+    </div>
+  </div>
+
+  <!-- Game End Popup -->
+  <div id="popup" class="hidden">
+    <h2 id="popup-message"></h2>
+    <p>Your Score: <span id="final-score"></span></p>
+    <button id="restart-btn">Play Again</button>
+    <canvas id="confetti-canvas"></canvas>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
