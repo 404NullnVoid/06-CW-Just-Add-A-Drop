@@ -1,3 +1,5 @@
+console.log('script.js loaded');
+
 const startScreen = document.getElementById("start-screen");
 const gameLogo = document.getElementById("game-logo");
 const gameWrapper = document.querySelector(".game-wrapper");
@@ -10,9 +12,17 @@ const popup = document.getElementById("popup");
 const popupMessage = document.getElementById("popup-message");
 const finalScore = document.getElementById("final-score");
 const restartBtn = document.getElementById("restart-btn");
+const difficultyScreen = document.getElementById("difficulty-screen");
+const classicBtn = document.getElementById("classic-btn");
+const challengeBtn = document.getElementById("challenge-btn");
+const homeBtn = document.getElementById("home-btn");
+const gameFooter = document.getElementById("game-footer");
+const difficultyFooter = document.getElementById("difficulty-footer");
 
+let currentMode = "classic"; // Will be either 'classic' or 'challenge'
 let score = 0;
 let timeLeft = 30;
+
 let gameRunning = false;
 let paused = false;
 let dropInterval, timerInterval;
@@ -28,11 +38,103 @@ const loseMessages = [
   "Give it another shot!",
 ];
 
-// Start game from logo click
-gameLogo.addEventListener("click", startGame);
+// --- Sound Effects ---
+const gameMusic = new Audio('sounds/game-music-loop-7-145285.mp3');
+gameMusic.loop = true;
+const selectSound = new Audio('sounds/select-sound-121244.mp3');
+const clickSound = new Audio('sounds/click-for-game-menu-131903.mp3');
+const gameStartSound = new Audio('sounds/game-start-317318.mp3');
+const gameOverSound = new Audio('sounds/game-over-classic-206486.mp3');
+
+function playClickSound() {
+  clickSound.currentTime = 0;
+  clickSound.play();
+}
+function playSelectSound() {
+  selectSound.currentTime = 0;
+  selectSound.play();
+}
+function playGameStartSound() {
+  gameStartSound.currentTime = 0;
+  gameStartSound.play();
+}
+
+function showFooter(footer) {
+  if (gameFooter) gameFooter.classList.add("hidden");
+  if (difficultyFooter) difficultyFooter.classList.add("hidden");
+  if (footer) footer.classList.remove("hidden");
+}
+
+// --- Navigation logic for strict screen separation ---
+homeBtn.addEventListener("click", () => {
+  playClickSound();
+  clearInterval(dropInterval);
+  clearInterval(timerInterval);
+  gameMusic.pause();
+  gameMusic.currentTime = 0;
+  gameRunning = false;
+  paused = false;
+  gameWrapper.classList.add("hidden");
+  popup.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  difficultyScreen.classList.add("hidden");
+  showFooter(null); // Hide all footers
+  document.getElementById('game-footer').classList.add('hidden'); // Hide game footer
+});
+
+gameLogo.addEventListener("click", () => {
+  playGameStartSound();
+  showDifficultyScreen();
+});
+
+// Add click sound to all buttons
+[...document.querySelectorAll('button')].forEach(btn => {
+  btn.addEventListener('click', playClickSound);
+});
+
+function showDifficultyScreen() {
+  startScreen.classList.add("hidden");
+  difficultyScreen.classList.remove("hidden");
+  gameWrapper.classList.add("hidden");
+  popup.classList.add("hidden");
+  showFooter(difficultyFooter);
+  document.getElementById('difficulty-footer').classList.remove('hidden'); // Show difficulty footer
+  document.getElementById('game-footer').classList.add('hidden'); // Hide game footer
+}
+
 startBtn.addEventListener("click", startGame);
 pauseBtn.addEventListener("click", togglePause);
 restartBtn.addEventListener("click", startGame);
+classicBtn.addEventListener("click", () => {
+  currentMode = "classic";
+  startGame();
+});
+
+challengeBtn.addEventListener("click", () => {
+  currentMode = "challenge";
+  startGame();
+});
+
+function showMilestoneMessage(msg) {
+  const el = document.getElementById('milestone-message');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  el.classList.add('show');
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.classList.add('hidden'), 500);
+  }, 1800);
+}
+
+// Track milestone state
+let halfwayShown = false;
+let winMilestoneShown = false;
+
+function resetMilestones() {
+  halfwayShown = false;
+  winMilestoneShown = false;
+}
 
 function startGame() {
   clearInterval(dropInterval);
@@ -40,17 +142,37 @@ function startGame() {
   paused = false;
   gameRunning = true;
   score = 0;
-  timeLeft = 30;
+  // Challenge mode: 50s, Classic: 30s
+  timeLeft = currentMode === "challenge" ? 50 : 30;
   scoreDisplay.textContent = score;
   timeDisplay.textContent = timeLeft;
   popup.classList.add("hidden");
   gameWrapper.classList.remove("hidden");
   startScreen.classList.add("hidden");
+  difficultyScreen.classList.add("hidden"); // Always hide difficulty screen when game starts
   document.querySelectorAll('.water-drop, .bad-drop').forEach(drop => drop.remove());
+  showFooter(gameFooter);
+  document.getElementById('difficulty-footer').classList.add('hidden'); // Hide difficulty footer
+  document.getElementById('game-footer').classList.remove('hidden'); // Show game footer
+  gameMusic.currentTime = 0;
+  gameMusic.play();
+  resetMilestones();
 
-  dropInterval = setInterval(() => {
-    if (!paused) createDrop();
-  }, 800);
+  // Set drop rate and drop logic based on mode
+  if (currentMode === "classic") {
+    dropInterval = setInterval(() => {
+      if (!paused) createDrop();
+    }, 800);
+  } else {
+    // Challenge mode: more blue, slightly more green, blue drops fall faster
+    dropInterval = setInterval(() => {
+      if (!paused) {
+        // 80% blue, 20% green (was 70/30), but more total drops
+        const isBad = Math.random() < 0.35; // Slightly more bad drops
+        createDrop(isBad, true); // true = challenge mode
+      }
+    }, 300); // More frequent drops
+  }
 
   timerInterval = setInterval(() => {
     if (!paused) {
@@ -59,6 +181,59 @@ function startGame() {
       if (timeLeft <= 0) endGame();
     }
   }, 1000);
+}
+
+// Accepts isBad and isChallengeMode for drop logic
+function createDrop(isBad = Math.random() < 0.3, isChallengeMode = false) {
+  const drop = document.createElement("div");
+  drop.className = isBad ? "bad-drop" : "water-drop";
+
+  const size = 30 + Math.random() * 30;
+  drop.style.width = `${size}px`;
+  drop.style.height = `${size * 1.5}px`;
+  drop.style.left = `${Math.random() * (gameContainer.offsetWidth - size)}px`;
+
+  // Randomize stacking order so blue/green drops can be above/below each other
+  drop.style.zIndex = Math.floor(Math.random() * 90) + 10; // 10-99
+
+  // Drop speed logic
+  if (isChallengeMode) {
+    if (isBad) {
+      drop.style.animationDuration = "5.5s"; // slower bad drops
+    } else {
+      drop.style.animationDuration = "3.2s"; // faster blue drops
+    }
+  } else {
+    drop.style.animationDuration = "4s";
+  }
+
+  drop.addEventListener("click", () => {
+    if (!gameRunning || paused) return;
+    if (isBad) {
+      playSelectSound();
+      showMilestoneMessage("Oops! Bad drop!");
+      score += -2;
+    } else {
+      playSelectSound();
+      score += 1;
+      // Check for milestones only on good drops
+      const winThreshold = currentMode === "classic" ? 20 : 35;
+      if (!halfwayShown && score >= Math.floor(winThreshold/2)) {
+        halfwayShown = true;
+        showMilestoneMessage("Halfway there!");
+      }
+      if (!winMilestoneShown && score >= winThreshold) {
+        winMilestoneShown = true;
+        showMilestoneMessage("You did it!");
+      }
+    }
+    if (score < 0) score = 0;
+    scoreDisplay.textContent = score;
+    drop.remove();
+  });
+
+  drop.addEventListener("animationend", () => drop.remove());
+  gameContainer.appendChild(drop);
 }
 
 function togglePause() {
@@ -70,40 +245,27 @@ function togglePause() {
   });
 }
 
-function createDrop() {
-  const drop = document.createElement("div");
-  const isBad = Math.random() < 0.3;
-  drop.className = isBad ? "bad-drop" : "water-drop";
-
-  const size = 30 + Math.random() * 30;
-  drop.style.width = `${size}px`;
-  drop.style.height = `${size * 1.5}px`;
-  drop.style.left = `${Math.random() * (gameContainer.offsetWidth - size)}px`;
-  drop.style.animationDuration = "4s";
-
-  drop.addEventListener("click", () => {
-    if (!gameRunning || paused) return;
-    score += isBad ? -2 : 1;
-    if (score < 0) score = 0;
-    scoreDisplay.textContent = score;
-    drop.remove();
-  });
-
-  drop.addEventListener("animationend", () => drop.remove());
-  gameContainer.appendChild(drop);
-}
-
 function endGame() {
   clearInterval(dropInterval);
   clearInterval(timerInterval);
   gameRunning = false;
   finalScore.textContent = score;
   popup.classList.remove("hidden");
+  showFooter(null); // Hide all footers
+  document.getElementById('game-footer').classList.add('hidden'); // Hide game footer
+  gameMusic.pause();
+  gameMusic.currentTime = 0;
+  setTimeout(() => {
+    gameOverSound.currentTime = 0;
+    gameOverSound.play();
+  }, 300); // slight delay for popup
 
-  const messageArr = score >= 20 ? winMessages : loseMessages;
+  // Win threshold: classic 20, challenge 35
+  const winThreshold = currentMode === "classic" ? 20 : 35;
+  const messageArr = score >= winThreshold ? winMessages : loseMessages;
   popupMessage.textContent = messageArr[Math.floor(Math.random() * messageArr.length)];
 
-  if (score >= 20) {
+  if (score >= winThreshold) {
     launchConfetti();
   }
 }

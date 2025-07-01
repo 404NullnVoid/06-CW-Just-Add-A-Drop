@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Just A Drop - Charity: Water Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Work+Sans:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -24,11 +27,29 @@
       <div class="controls">
         <button id="start-btn">▶️</button>
         <button id="pause-btn">⏸</button>
+        <button id="home-btn" title="Home">🏠</button>
       </div>
     </div>
     <div id="game-container">
       <canvas id="spark-canvas"></canvas>
       <!-- ...other game elements... -->
+    </div>
+    <div class="footer" id="game-footer">
+      <a href="https://www.charitywater.org" target="_blank">Charity Water Homepage</a> |
+      <a href="https://www.charitywater.org/donate" target="_blank">Donation Page</a>
+    </div>
+  </div>
+
+  <!-- Difficulty Selection Screen -->
+  <div id="difficulty-screen" class="hidden">
+    <h2>Select Your Mode</h2>
+    <div class="difficulty-buttons">
+      <button id="classic-btn">Classic</button>
+      <button id="challenge-btn">Challenge</button>
+    </div>
+    <div class="footer" id="difficulty-footer">
+      <a href="https://www.charitywater.org" target="_blank">Charity Water Homepage</a> |
+      <a href="https://www.charitywater.org/donate" target="_blank">Donation Page</a>
     </div>
   </div>
 
@@ -39,6 +60,9 @@
     <button id="restart-btn">Play Again</button>
     <canvas id="confetti-canvas"></canvas>
   </div>
+
+  <!-- Milestone Message Container -->
+  <div id="milestone-message" class="milestone-message hidden"></div>
 
   <script src="script.js"></script>
 </body>

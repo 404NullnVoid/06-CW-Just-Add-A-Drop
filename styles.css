@@ -18,6 +18,21 @@ Fonts:
 
 */
 
+@font-face {
+  font-family: "Proxima Nova";
+  src: url("fonts/proximanova_regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Avenir";
+  src: url("fonts/AvenirLTStd-Roman.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -25,12 +40,52 @@ Fonts:
 }
 
 body {
-  font-family: Avenir, sans-serif;
-  background: linear-gradient(120deg, #8BD1CB 0%, #fff7d6 50%, #FFC907 100%);
+  background: 
+    linear-gradient(135deg, #FFC907 0%, #2E9DF7 40%, #8BD1CB 70%, #f3c616 100%);
   background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-family: Avenir, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 2rem;
+}
+
+/* For headers (like titles or buttons) */
+.header, h1, h2, h3, h4, h5, h6, .difficulty-buttons button, .score, .timer, .controls button {
+  font-family: "Proxima Nova", "Work Sans", Avenir, sans-serif;
+}
+
+/* Proxima Nova for headers and important UI (use Work Sans as web fallback) */
+#difficulty-screen h2,
+.difficulty-buttons button,
+.score, .timer,
+#popup-message {
+  font-family: "Proxima Nova", "Work Sans", Avenir, sans-serif;
+}
+
+/* Avenir for footer links and final score (use Nunito Sans as web fallback) */
+.footer, .footer a, #final-score, #final-score span {
+  font-family: Avenir, "Nunito Sans", "Work Sans", sans-serif;
+}
+
+/* For body text (instructions, score, footer links) */
+body, p {
+  font-family: Avenir, "Nunito Sans", "Work Sans", sans-serif;
+}
+
+/* Make final score larger and Avenir */
+#final-score {
+  font-size: 2.2rem;
+  font-family: Avenir, "Work Sans", sans-serif;
+  font-weight: 700;
+}
+
+/* Make popup header (win/lose message) larger */
+#popup-message {
+  font-size: 2.1rem;
+  font-weight: 700;
 }
 
 .hidden {
@@ -38,7 +93,7 @@ body {
 }
 
 .charity-logo {
-  width: 260px;         /* Increased from 200px */
+  width: 280px;         /* Increased from 200px */
   margin: 40px auto 10px auto;
   display: block;
 }
@@ -84,14 +139,21 @@ body {
 }
 
 .controls button {
-  background: #2e9df7;
-  color: white;
+  width: 60px;
+  height: 60px;
   border: none;
-  font-size: 18px;
-  margin-left: 8px;
-  padding: 5px 12px;
-  border-radius: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at top left, #8BD1CB, #2E9DF7);
+  color: white;
+  font-size: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.controls button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 #game-container {
@@ -102,7 +164,7 @@ body {
   max-height: 800px;
   border: 2px solid #333;
   border-radius: 10px;
-  background-color: #cfefff;
+  background-color: #71aca7f6;
   overflow: hidden;
   margin: 0 10vw 0.5in 10vw;
   box-sizing: border-box;
@@ -117,37 +179,41 @@ body {
   z-index: 2;
 }
 
-/* Raindrop shape */
+/* Unified drop styling */
 .water-drop, .bad-drop {
   position: absolute;
   width: 40px;
   height: 60px;
-  border-radius: 50% 50% 70% 70% / 70% 70% 100% 100%;
-  transform: rotate(225deg);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform: rotate(45deg);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   animation: fall linear forwards;
   cursor: pointer;
-  box-shadow: inset -2px -3px 4px rgba(0,0,0,0.1);
+  position: absolute;
 }
 
-.water-drop {
-  background: radial-gradient(circle at 30% 30%, #2e9df7, #1875c0);
-}
-
-.bad-drop {
-  background: radial-gradient(circle at 30% 30%, #669966, #446644);
-}
-
+/* Glossy highlight on drop */
 .water-drop::before,
 .bad-drop::before {
   content: "";
   position: absolute;
-  top: 10%;
-  left: 15%;
+  top: 15%;
+  left: 20%;
   width: 10px;
   height: 20px;
   background: rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   transform: rotate(-20deg);
+}
+
+/* Water drop - clean */
+.water-drop {
+  background: radial-gradient(circle at 30% 30%, #ffffff88, #2E9DF7);
+}
+
+/* Bad drop - polluted */
+.bad-drop {
+  background: radial-gradient(circle at 30% 30%, #ffffff88, #159A48);
 }
 
 @keyframes fall {
@@ -174,12 +240,15 @@ body {
 }
 
 #popup-message {
-  font-size: 28px;
+  font-size: 2.1rem;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
 #final-score {
-  font-size: 24px;
+  font-size: 2.2rem;
+  font-family: Avenir, "Work Sans", sans-serif;
+  font-weight: 700;
   margin: 10px 0;
 }
 
@@ -199,6 +268,35 @@ body {
   top: 0;
   left: 0;
   pointer-events: none;
+}
+
+#difficulty-screen {
+  text-align: center;
+  margin-top: 60px;
+}
+
+.difficulty-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  margin-top: 32px;
+}
+
+.difficulty-buttons button {
+  width: 220px;
+  height: 80px;
+  font-size: 2rem;
+  border-radius: 40px;
+  background: radial-gradient(circle at top left, #8BD1CB, #2E9DF7);
+  color: white;
+  box-shadow: 0 4px 6px rgba(54, 56, 55, 0.564);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.difficulty-buttons button:hover {
+  transform: scale(1.05);
 }
 
 @media (max-width: 850px) {
@@ -224,4 +322,60 @@ body {
 
 .pop {
   animation: pop 0.2s forwards;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  text-align: center;
+  font-size: 14px;
+  height: 0.5in;
+  line-height: 0.5in;
+  color: #2E9DF7;
+  font-weight: 500;
+  background: #fff;
+  box-shadow: 0 -2px 10px rgba(46,157,247,0.07);
+  z-index: 1001;
+}
+
+.footer a {
+  color: #2E9DF7;
+  text-decoration: none;
+  padding: 0 10px;
+  transition: color 0.2s ease;
+}
+
+.footer a:hover {
+  color: #FFC907;
+}
+
+.milestone-message {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(46,157,247,0.92);
+  color: #fff;
+  font-family: "Proxima Nova", "Work Sans", Avenir, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 12px 32px;
+  border-radius: 32px;
+  box-shadow: 0 2px 12px rgba(46,157,247,0.13);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+.milestone-message.show {
+  opacity: 1;
+  animation: floatUp 2.2s cubic-bezier(.4,1.6,.6,1) forwards;
+}
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateX(-50%) translateY(0); }
+  10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  80% { opacity: 1; transform: translateX(-50%) translateY(-30px); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
 }
